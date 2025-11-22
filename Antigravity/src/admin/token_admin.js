@@ -3,6 +3,7 @@ import AdmZip from 'adm-zip';
 import path from 'path';
 import { spawn } from 'child_process';
 import logger from '../utils/logger.js';
+import tokenManager from '../auth/token_manager.js';
 
 const ACCOUNTS_FILE = path.join(process.cwd(), 'data', 'accounts.json');
 
@@ -28,6 +29,8 @@ async function saveAccounts(accounts) {
     await fs.mkdir(dir, { recursive: true });
   }
   await fs.writeFile(ACCOUNTS_FILE, JSON.stringify(accounts, null, 2), 'utf-8');
+  // 强制重新加载 tokens
+  tokenManager.forceReload();
 }
 
 // 删除账号
@@ -297,7 +300,7 @@ export async function importTokens(filePath) {
     // 清理上传的文件
     try {
       await fs.unlink(filePath);
-    } catch (e) {}
+    } catch (e) { }
     throw error;
   }
 }
